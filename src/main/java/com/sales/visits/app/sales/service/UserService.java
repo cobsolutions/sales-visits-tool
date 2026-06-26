@@ -11,7 +11,9 @@ import com.sales.visits.app.sales.repository.PermissionRepository;
 import com.sales.visits.app.sales.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public UserResponse createUser(CreateUserRequest createUserRequest, User superAdmin) {
         validateTeamLeader(createUserRequest);
 
@@ -58,6 +61,14 @@ public class UserService {
 
         userRepository.save(user);
         return UserResponse.from(user);
+    }
+
+    @Transactional
+    public List<UserResponse> listUsers(User admin){
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserResponse.from(user))
+                .collect(Collectors.toList());
     }
 
     private void validateTeamLeader(CreateUserRequest request) {

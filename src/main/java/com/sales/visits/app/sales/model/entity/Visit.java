@@ -3,15 +3,13 @@ package com.sales.visits.app.sales.model.entity;
 import com.sales.visits.app.sales.model.enums.VisitImpression;
 import com.sales.visits.app.sales.model.enums.VisitType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +23,10 @@ import java.util.List;
                 )
         }
 )
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"account", "visitor", "joinedVisitor", "physicians"})
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -42,6 +43,7 @@ public class Visit {
     private LocalDate visitDate;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "visit_type", nullable = false)
     private VisitType visitType;
 
@@ -49,6 +51,7 @@ public class Visit {
     @JoinColumn(name = "visitor_id", nullable = false)
     private User visitor;
 
+    @Builder.Default
     @Column(name = "joined_visit", nullable = false)
     private boolean joinedVisit = false;
 
@@ -57,6 +60,7 @@ public class Visit {
     private User joinedVisitor;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "visit_impression", nullable = false)
     private VisitImpression visitImpression;
 
@@ -70,8 +74,13 @@ public class Visit {
     @Column(name = "next_visit_date")
     private LocalDate nextVisitDate;
 
+    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<VisitPhysician> physicians = new ArrayList<>();
+
+    @Builder.Default
     @Column(name = "status", nullable = false, length = 30)
-    private String status = "RECORDED";
+    private String status = "PENDING_APPROVAL";
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

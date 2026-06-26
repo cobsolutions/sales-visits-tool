@@ -3,10 +3,9 @@ package com.sales.visits.app.sales.model.entity;
 import com.sales.visits.app.sales.model.enums.ApprovalStatus;
 import com.sales.visits.app.sales.model.enums.PreferredCommunication;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 
@@ -20,7 +19,10 @@ import java.time.OffsetDateTime;
                 )
         }
 )
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"parentOrganization", "borough", "ptocLocation", "submittedBy", "approvedBy"})
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -69,9 +71,11 @@ public class Account {
     private String email;
 
     @Column(name = "provides_telehealth", nullable = false)
+    @Builder.Default
     private boolean providesTelehealth = false;
 
     @Column(name = "same_day_walkins", nullable = false)
+    @Builder.Default
     private boolean sameDayWalkins = false;
 
     @Column(name = "gatekeeper_name", length = 150)
@@ -87,10 +91,13 @@ public class Account {
     private String gatekeeperEmail;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "preferred_communication")
     private PreferredCommunication preferredCommunication;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Builder.Default
     @Column(name = "status", nullable = false)
     private ApprovalStatus status = ApprovalStatus.PENDING_APPROVAL;
 

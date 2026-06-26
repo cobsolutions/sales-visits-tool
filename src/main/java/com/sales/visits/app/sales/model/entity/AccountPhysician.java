@@ -1,10 +1,7 @@
 package com.sales.visits.app.sales.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -20,7 +17,10 @@ import java.time.LocalDate;
                 )
         }
 )
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"account", "physician"})
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,6 +40,7 @@ public class AccountPhysician {
     private Physician physician;
 
     @Column(name = "date_first_seen", nullable = false)
+    @Builder.Default
     private LocalDate dateFirstSeen = LocalDate.now();
 
 }

@@ -8,10 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -30,5 +29,12 @@ public class SuperAdminController {
     public UserResponse createUser(@RequestBody CreateUserRequest createUserRequest, @AuthenticationPrincipal User superAdmin) {
         log.info("CONTROLLER METHOD REACHED. Principal: " + superAdmin);
         return userService.createUser(createUserRequest, superAdmin);
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('SUPER_ADMIN') and " +
+            "hasAuthority('USER_MANAGE')")
+    public List<UserResponse> getUsers(@AuthenticationPrincipal User superAdmin) {
+        return userService.listUsers(superAdmin);
     }
 }

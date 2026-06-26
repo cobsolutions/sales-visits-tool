@@ -2,16 +2,16 @@ package com.sales.visits.app.sales.model.entity;
 
 import com.sales.visits.app.sales.model.enums.ApprovalStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "physicians")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"specialty", "submittedBy", "approvedBy"})
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -37,6 +37,7 @@ public class Physician {
     private String phone;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = "status", nullable = false)
     private ApprovalStatus status = ApprovalStatus.PENDING_APPROVAL;
 

@@ -250,6 +250,13 @@ CREATE TABLE visits (
                                 (joined_visit = FALSE AND joined_visitor_id IS NULL)
                                 )
 );
+ALTER TABLE visits
+DROP COLUMN status;
+
+ALTER TABLE visits
+    ADD COLUMN status approval_status NOT NULL DEFAULT 'PENDING_APPROVAL',
+    ADD COLUMN approved_by BIGINT REFERENCES users(id),
+    ADD COLUMN reviewed_at TIMESTAMPTZ
 
 -- =========================
 -- VISIT PHYSICIANS
