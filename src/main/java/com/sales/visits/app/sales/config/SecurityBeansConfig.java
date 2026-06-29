@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.core.AuthenticationException;
 import java.io.IOException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Slf4j
 @Configuration
@@ -31,16 +32,19 @@ import org.springframework.security.access.AccessDeniedException;
 public class SecurityBeansConfig  {
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
+    private final CorsConfig corsConfig;
 
-    public SecurityBeansConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFilter jwtAuthFilter) {
+    public SecurityBeansConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFilter jwtAuthFilter, CorsConfig corsConfig) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
+        this.corsConfig = corsConfig;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login", "/error").permitAll()

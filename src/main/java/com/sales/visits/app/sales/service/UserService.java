@@ -1,6 +1,7 @@
 package com.sales.visits.app.sales.service;
 
 import com.sales.visits.app.sales.dto.CreateUserRequest;
+import com.sales.visits.app.sales.dto.TeamLeaderResponse;
 import com.sales.visits.app.sales.dto.UserResponse;
 import com.sales.visits.app.sales.exception.PermissionNotFound;
 import com.sales.visits.app.sales.model.entity.Permission;
@@ -68,6 +69,13 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(user -> UserResponse.from(user))
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamLeaderResponse> getTeamLeaders() {
+        return userRepository.findByRole(UserRole.TEAM_LEADER)
+                .stream()
+                .map(TeamLeaderResponse::from)
                 .collect(Collectors.toList());
     }
 

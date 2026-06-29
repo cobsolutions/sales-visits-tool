@@ -1,6 +1,7 @@
 package com.sales.visits.app.sales.controller;
 
 import com.sales.visits.app.sales.dto.CreateUserRequest;
+import com.sales.visits.app.sales.dto.TeamLeaderResponse;
 import com.sales.visits.app.sales.dto.UserResponse;
 import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.service.UserService;
@@ -36,5 +37,12 @@ public class SuperAdminController {
             "hasAuthority('USER_MANAGE')")
     public List<UserResponse> getUsers(@AuthenticationPrincipal User superAdmin) {
         return userService.listUsers(superAdmin);
+    }
+
+    @GetMapping("/team-leaders")
+    @PreAuthorize("hasRole('SUPER_ADMIN') and " +
+            "hasAuthority('USER_MANAGE')")
+    public List<TeamLeaderResponse> getTeamLeaders(@AuthenticationPrincipal User superAdmin) {
+        return userService.getTeamLeaders();
     }
 }
