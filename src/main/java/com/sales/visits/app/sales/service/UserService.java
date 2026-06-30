@@ -4,6 +4,7 @@ import com.sales.visits.app.sales.dto.CreateUserRequest;
 import com.sales.visits.app.sales.dto.TeamLeaderResponse;
 import com.sales.visits.app.sales.dto.UserResponse;
 import com.sales.visits.app.sales.exception.PermissionNotFound;
+import com.sales.visits.app.sales.exception.UserNotFound;
 import com.sales.visits.app.sales.model.entity.Permission;
 import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.model.enums.UserRole;
@@ -99,5 +100,26 @@ public class UserService {
                 throw new IllegalArgumentException("Assigned user must have TEAM_LEADER role");
             }
         }
+    }
+
+    @Transactional
+    public void suspendUser(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if(user.getStatus().equals(UserStatus.ACTIVE)){
+            user.setStatus(UserStatus.SUSPENDED);
+            userRepository.save(user);
+        }
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.getRole() == UserRole.SUPER_ADMIN) {
+            throw new IllegalArgumentException("SUPER_ADMIN accounts cannot be deleted.");
+        }
+
+        userRepository.delete(user);
     }
 }
