@@ -37,10 +37,15 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        } catch (BadCredentialsException | DisabledException ex) {
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()));
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Your account has been suspended."));
+        } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid email or password"));
+                    .body(Map.of("message", "Invalid email or password."));
         }
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow();

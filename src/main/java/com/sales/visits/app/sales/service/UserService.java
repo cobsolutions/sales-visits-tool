@@ -69,6 +69,7 @@ public class UserService {
     public List<UserResponse> listUsers(User admin){
         return userRepository.findAll()
                 .stream()
+                .filter(user -> !user.getId().equals(admin.getId()))
                 .map(user -> UserResponse.from(user))
                 .collect(Collectors.toList());
     }
@@ -103,21 +104,38 @@ public class UserService {
     }
 
     @Transactional
-    public void suspendUser(Long userId){
+    public void suspendUser(Long userId, User admin) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if(user.getStatus().equals(UserStatus.ACTIVE)){
-            user.setStatus(UserStatus.SUSPENDED);
-            userRepository.save(user);
+
+        if (user.getId().equals(admin.getId())) {
+            throw new IllegalArgumentException("You cannot suspend your own account");
         }
+
+        user.setStatus(UserStatus.SUSPENDED);
+        userRepository.save(user);
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public void activateUser(Long userId, User admin) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (user.getRole() == UserRole.SUPER_ADMIN) {
-            throw new IllegalArgumentException("SUPER_ADMIN accounts cannot be deleted.");
+
+        if (user.getId().equals(admin.getId())) {
+            throw new IllegalArgumentException("You cannot suspend your own account");
+        }
+
+        user.setStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId, User admin) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user.getId().equals(admin.getId())) {
+            throw new IllegalArgumentException("You cannot delete your own account");
         }
 
         userRepository.delete(user);

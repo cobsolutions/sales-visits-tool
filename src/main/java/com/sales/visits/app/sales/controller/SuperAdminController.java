@@ -4,16 +4,15 @@ import com.sales.visits.app.sales.dto.CreateUserRequest;
 import com.sales.visits.app.sales.dto.TeamLeaderResponse;
 import com.sales.visits.app.sales.dto.UserResponse;
 import com.sales.visits.app.sales.model.entity.User;
-import com.sales.visits.app.sales.model.enums.UserStatus;
 import com.sales.visits.app.sales.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -48,19 +47,27 @@ public class SuperAdminController {
         return userService.getTeamLeaders();
     }
 
-    @PatchMapping("/users/{userId}/suspend")
+    @PatchMapping("/users/{id}/suspend")
     @PreAuthorize("hasRole('SUPER_ADMIN') and " +
             "hasAuthority('USER_MANAGE')")
-    public ResponseEntity<?> suspendUser(@AuthenticationPrincipal User superAdmin,@PathVariable Long userId){
-        userService.suspendUser(userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> suspendUser(@PathVariable Long id, @AuthenticationPrincipal User superAdmin) {
+        userService.suspendUser(id, superAdmin);
+        return ResponseEntity.ok(Map.of("message", "User suspended"));
     }
 
-    @DeleteMapping("/users/{userId}")
+    @PatchMapping("/users/{id}/activate")
     @PreAuthorize("hasRole('SUPER_ADMIN') and " +
             "hasAuthority('USER_MANAGE')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> activateUser(@PathVariable Long id, @AuthenticationPrincipal User superAdmin) {
+        userService.activateUser(id, superAdmin);
+        return ResponseEntity.ok(Map.of("message", "User activated"));
+    }
+
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN') and " +
+            "hasAuthority('USER_MANAGE')")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, @AuthenticationPrincipal User superAdmin) {
+        userService.deleteUser(id, superAdmin);
+        return ResponseEntity.ok(Map.of("message", "User deleted"));
     }
 }

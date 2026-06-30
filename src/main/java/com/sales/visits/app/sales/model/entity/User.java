@@ -103,11 +103,14 @@ public class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
 
     @Override
     public String getPassword() {
         return this.passwordHash;
     }
+
+    @Override
+    public boolean isEnabled() { return this.status == UserStatus.ACTIVE; }
 }
