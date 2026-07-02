@@ -4,6 +4,7 @@ import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.model.enums.UserRole;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +16,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRole(UserRole role);
     @EntityGraph(attributePaths = {"teamLeader", "createdBy"})
     List<User> findAll();
+
+    @Query("""
+    SELECT u FROM User u
+    WHERE u.role IN (
+        com.sales.visits.app.sales.model.enums.UserRole.TEAM_LEADER,
+        com.sales.visits.app.sales.model.enums.UserRole.SALES_REP
+    )
+      AND u.status = com.sales.visits.app.sales.model.enums.UserStatus.ACTIVE
+    ORDER BY u.username
+    """)
+    List<User> findEligibleJoinedVisitors();
 }

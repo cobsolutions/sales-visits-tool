@@ -3,6 +3,8 @@ package com.sales.visits.app.sales.model.entity;
 import com.sales.visits.app.sales.model.enums.ApprovalStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 
@@ -37,6 +39,7 @@ public class Physician {
     private String phone;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Builder.Default
     @Column(name = "status", nullable = false)
     private ApprovalStatus status = ApprovalStatus.PENDING_APPROVAL;

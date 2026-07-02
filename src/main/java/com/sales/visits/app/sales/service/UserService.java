@@ -1,21 +1,30 @@
 package com.sales.visits.app.sales.service;
 
-import com.sales.visits.app.sales.dto.CreateUserRequest;
-import com.sales.visits.app.sales.dto.TeamLeaderResponse;
-import com.sales.visits.app.sales.dto.UserResponse;
+import com.sales.visits.app.sales.dto.request.CreateUserRequest;
+import com.sales.visits.app.sales.dto.request.LoginRequest;
+import com.sales.visits.app.sales.dto.response.LoginResponse;
+import com.sales.visits.app.sales.dto.response.TeamLeaderResponse;
+import com.sales.visits.app.sales.dto.response.UserResponse;
+import com.sales.visits.app.sales.exception.AccountSuspendedException;
+import com.sales.visits.app.sales.exception.InvalidCredentialsException;
 import com.sales.visits.app.sales.exception.PermissionNotFound;
-import com.sales.visits.app.sales.exception.UserNotFound;
 import com.sales.visits.app.sales.model.entity.Permission;
 import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.model.enums.UserRole;
 import com.sales.visits.app.sales.model.enums.UserStatus;
 import com.sales.visits.app.sales.repository.PermissionRepository;
 import com.sales.visits.app.sales.repository.UserRepository;
+import com.sales.visits.app.sales.security.JwtService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,11 +33,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, PermissionRepository permissionRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PermissionRepository permissionRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
         this.permissionRepository = permissionRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Transactional
@@ -139,5 +152,36 @@ public class UserService {
         }
 
         userRepository.delete(user);
+    }
+
+    public LoginResponse login(LoginRequest loginRequest) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()));
+        } catch (DisabledException ex) {
+            throw  new AccountSuspendedException("Your account has been suspended.");
+        } catch (BadCredentialsException ex) {
+            throw  new InvalidCredentialsException("Invalid username or password.");
+        }
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow();
+
+        String token = jwtService.generateToken(user);
+
+        return LoginResponse.builder()
+                .token(token)
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .permissions(user.getPermissions().stream()
+                        .map(Permission::getCode)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    public List<User> findJoinedVisitors(){
+        return userRepository.findEligibleJoinedVisitors();
     }
 }

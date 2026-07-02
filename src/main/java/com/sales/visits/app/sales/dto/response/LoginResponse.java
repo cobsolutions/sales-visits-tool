@@ -1,4 +1,4 @@
-package com.sales.visits.app.sales.dto;
+package com.sales.visits.app.sales.dto.response;
 
 import com.sales.visits.app.sales.model.enums.UserRole;
 import lombok.AllArgsConstructor;

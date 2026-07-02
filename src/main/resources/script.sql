@@ -2,7 +2,7 @@
 -- ENUM TYPES
 -- =========================
 
-CREATE TYPE user_role AS ENUM (
+CREATE TYPE UserRole AS ENUM (
     'SUPER_ADMIN',
 	'ADMIN',
 	'TEAM_LEADER',
@@ -10,7 +10,7 @@ CREATE TYPE user_role AS ENUM (
 );
 
 
-CREATE TYPE user_status AS ENUM (
+CREATE TYPE UserStatus AS ENUM (
     'ACTIVE',
     'INACTIVE',
     'SUSPENDED'

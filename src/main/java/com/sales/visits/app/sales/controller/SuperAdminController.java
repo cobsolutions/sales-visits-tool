@@ -1,8 +1,8 @@
 package com.sales.visits.app.sales.controller;
 
-import com.sales.visits.app.sales.dto.CreateUserRequest;
-import com.sales.visits.app.sales.dto.TeamLeaderResponse;
-import com.sales.visits.app.sales.dto.UserResponse;
+import com.sales.visits.app.sales.dto.request.CreateUserRequest;
+import com.sales.visits.app.sales.dto.response.TeamLeaderResponse;
+import com.sales.visits.app.sales.dto.response.UserResponse;
 import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.service.UserService;
 import lombok.extern.slf4j.Slf4j;

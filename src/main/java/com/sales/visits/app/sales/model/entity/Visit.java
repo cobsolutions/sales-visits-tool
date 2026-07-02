@@ -1,5 +1,6 @@
 package com.sales.visits.app.sales.model.entity;
 
+import com.sales.visits.app.sales.model.enums.ApprovalStatus;
 import com.sales.visits.app.sales.model.enums.VisitImpression;
 import com.sales.visits.app.sales.model.enums.VisitType;
 import jakarta.persistence.*;
@@ -78,9 +79,11 @@ public class Visit {
     @Builder.Default
     private List<VisitPhysician> physicians = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Builder.Default
-    @Column(name = "status", nullable = false, length = 30)
-    private String status = "PENDING_APPROVAL";
+    @Column(name = "status", nullable = false)
+    private ApprovalStatus status = ApprovalStatus.PENDING_APPROVAL;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -88,8 +91,5 @@ public class Visit {
     @PrePersist
     protected void onCreate() {
         this.createdAt = OffsetDateTime.now();
-        if (this.status == null) {
-            this.status = "RECORDED";
-        }
     }
 }

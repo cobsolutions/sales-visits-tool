@@ -1,4 +1,4 @@
-package com.sales.visits.app.sales.dto;
+package com.sales.visits.app.sales.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.sales.visits.app.sales.dto;
+package com.sales.visits.app.sales.dto.response;
 
 import com.sales.visits.app.sales.model.entity.Permission;
 import com.sales.visits.app.sales.model.entity.User;
