@@ -1,5 +1,5 @@
 package com.sales.visits.app.sales.dto.request;
 
-public record RejectRequest(
-        String reason
-) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record RejectRequest(@NotBlank(message = "A rejection reason is required") String reason) {}

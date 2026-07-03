@@ -5,14 +5,19 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record VisitReviewRequest(
         @Valid @NotNull VisitFieldsRequest visit,
 
-        @Valid @NotNull AccountFieldsRequest account,
+        @Valid @NotNull NewAccountRequest account,
 
         @Valid @NotEmpty
         @Size(max = 20, message = "A visit can include at most 20 physicians")
         List<PhysicianFieldsRequest> physicians
+
+//        @NotNull Long approvedBy,
+//
+//        @NotNull LocalDate reviewedAt
 ) {}

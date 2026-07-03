@@ -85,6 +85,15 @@ public class Visit {
     @Column(name = "status", nullable = false)
     private ApprovalStatus status = ApprovalStatus.PENDING_APPROVAL;
 
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
+    @Column(name = "approved_by")
+    private Long approvedBy;
+
+    @Column(name = "reviewed_at")
+    private OffsetDateTime reviewedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 

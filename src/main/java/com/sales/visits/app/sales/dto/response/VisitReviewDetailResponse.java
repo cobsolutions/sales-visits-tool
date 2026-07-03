@@ -19,5 +19,6 @@ public record VisitReviewDetailResponse(
         String notes,
         LocalDate nextVisitDate,
         AccountReviewDetail account,
-        List<PhysicianReviewDetail> physicians
+        List<PhysicianReviewDetail> physicians,
+        String reason
 ) {}

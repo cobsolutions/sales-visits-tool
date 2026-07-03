@@ -100,8 +100,11 @@ public class NewVisitService {
 
         Borough borough = boroughRepository.findById(accountRequest.boroughId()).orElseThrow(() -> new EntityNotFoundException("Borough not found"));
         PtocLocation ptocLocation = ptocLocationRepository.findById(accountRequest.ptocLocationId()).orElseThrow(() -> new EntityNotFoundException("PtocLocation not found"));
-        ParentOrganization parentOrganization = parentOrganizationRepository.findById(accountRequest.parentOrganizationId()).orElseThrow(() -> new EntityNotFoundException("ParentOrganization not found"));
-
+        ParentOrganization parentOrganization = null;
+        if (accountRequest.parentOrganizationId() != null) {
+            parentOrganization = parentOrganizationRepository.findById(accountRequest.parentOrganizationId())
+                    .orElseThrow(() -> new EntityNotFoundException("ParentOrganization not found"));
+        }
         Account account = Account.builder()
                 .organizationName(accountRequest.organizationName())
                 .parentOrganization(parentOrganization)
@@ -170,5 +173,9 @@ public class NewVisitService {
                     .dateFirstSeen(dateFirstSeen)
                     .build());
         }
+    }
+
+    public List<User> findJoinedVisitors(){
+        return userRepository.findEligibleJoinedVisitors();
     }
 }
