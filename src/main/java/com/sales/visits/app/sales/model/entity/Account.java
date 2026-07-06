@@ -31,9 +31,6 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "account_id", unique = true, length = 30)
-    private String accountId;
-
     @Column(name = "organization_name", nullable = false, length = 255)
     private String organizationName;
 

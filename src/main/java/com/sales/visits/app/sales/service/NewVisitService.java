@@ -3,7 +3,6 @@ package com.sales.visits.app.sales.service;
 import com.sales.visits.app.sales.dto.request.NewAccountRequest;
 import com.sales.visits.app.sales.dto.request.NewVisitRequest;
 import com.sales.visits.app.sales.dto.request.PhysicianFieldsRequest;
-import com.sales.visits.app.sales.exception.DuplicateNpiException;
 import com.sales.visits.app.sales.exception.EntityNotFoundException;
 import com.sales.visits.app.sales.model.entity.*;
 import com.sales.visits.app.sales.model.enums.ApprovalStatus;
@@ -15,31 +14,28 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
 public class NewVisitService {
     private final AccountRepository accountRepository;
     private final VisitRepository visitRepository;
-    private final PhysicianRepository physicianRepository;
     private final AccountPhysicianRepository accountPhysicianRepository;
     private final BoroughRepository boroughRepository;
     private final PtocLocationRepository ptocLocationRepository;
     private final ParentOrganizationRepository parentOrganizationRepository;
-    private final SpecialtyRepository specialtyRepository;
     private final UserRepository userRepository;
+    private final PhysicianResolutionService physicianResolutionService;
 
-    public NewVisitService(AccountRepository accountRepository, VisitRepository visitRepository, PhysicianRepository physicianRepository, AccountPhysicianRepository accountPhysicianRepository, BoroughRepository boroughRepository, PtocLocationRepository ptocLocationRepository, ParentOrganizationRepository parentOrganizationRepository, SpecialtyRepository specialtyRepository, UserRepository userRepository) {
+    public NewVisitService(AccountRepository accountRepository, VisitRepository visitRepository, AccountPhysicianRepository accountPhysicianRepository, BoroughRepository boroughRepository, PtocLocationRepository ptocLocationRepository, ParentOrganizationRepository parentOrganizationRepository, UserRepository userRepository, PhysicianResolutionService physicianResolutionService) {
         this.accountRepository = accountRepository;
         this.visitRepository = visitRepository;
-        this.physicianRepository = physicianRepository;
         this.accountPhysicianRepository = accountPhysicianRepository;
         this.boroughRepository = boroughRepository;
         this.ptocLocationRepository = ptocLocationRepository;
         this.parentOrganizationRepository = parentOrganizationRepository;
-        this.specialtyRepository = specialtyRepository;
         this.userRepository = userRepository;
+        this.physicianResolutionService = physicianResolutionService;
     }
 
     @Transactional
@@ -66,15 +62,15 @@ public class NewVisitService {
         }
         List<VisitPhysician> links = new ArrayList<>();
         for(PhysicianFieldsRequest physicianReq : uniquePhysicians.values()){
-            Physician physician = resolvePhysician(physicianReq, currentUser);
+            Physician physician = physicianResolutionService.resolvePhysician(physicianReq, currentUser,ApprovalStatus.PENDING_APPROVAL);
             links.add(VisitPhysician.builder().visit(visit).physician(physician).build());
-            linkAccountPhysician(account, physician, newVisitRequest.visitDate());
+            physicianResolutionService.linkAccountPhysician(account, physician, newVisitRequest.visitDate());
         }
         visit.setPhysicians(links);
         return visitRepository.save(visit);
     }
 
-    private User resolveJoinedVisitor(boolean joinedVisit,Long joinedVisitorId, User currentUser) {
+    public User resolveJoinedVisitor(boolean joinedVisit,Long joinedVisitorId, User currentUser) {
         if (!joinedVisit) return null;
         if(joinedVisitorId == null) throw new IllegalArgumentException("joinedVisitorId is required when joinedVisit=true");
 
@@ -134,44 +130,6 @@ public class NewVisitService {
                     .findByOrganizationNameAndZipCodeAndAddressAndFloorSuite(
                             accountRequest.organizationName(), accountRequest.zipCode(), accountRequest.address(), accountRequest.floorSuite())
                     .orElseThrow(() -> e);
-        }
-    }
-
-    private Physician resolvePhysician(PhysicianFieldsRequest physicianFieldsRequest, User currentUser) {
-        if (physicianFieldsRequest.isExisting()) {
-            return physicianRepository.findById(physicianFieldsRequest.physicianId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Physician " + physicianFieldsRequest.physicianId() + " not found"));
-        }
-        return physicianRepository.findByNpi(physicianFieldsRequest.npi())
-                .orElseGet(() -> {
-                    Specialty specialty = specialtyRepository.findById(physicianFieldsRequest.specialtyId())
-                            .orElseThrow(() -> new EntityNotFoundException("Specialty not found"));
-                    try {
-                        return physicianRepository.save(Physician.builder()
-                                .npi(physicianFieldsRequest.npi())
-                                .name(physicianFieldsRequest.name())
-                                .specialty(specialty)
-                                .email(physicianFieldsRequest.email())
-                                .phone(physicianFieldsRequest.phone())
-                                .status(ApprovalStatus.PENDING_APPROVAL)
-                                .submittedBy(currentUser)
-                                .build());
-                    } catch (DataIntegrityViolationException e) {
-                        throw new DuplicateNpiException(physicianFieldsRequest.npi());
-                    }
-                });
-    }
-
-    private void linkAccountPhysician(Account account, Physician physician, LocalDate dateFirstSeen) {
-        boolean alreadyLinked = accountPhysicianRepository
-                .existsByAccountIdAndPhysicianId(account.getId(), physician.getId());
-        if (!alreadyLinked) {
-            accountPhysicianRepository.save(AccountPhysician.builder()
-                    .account(account)
-                    .physician(physician)
-                    .dateFirstSeen(dateFirstSeen)
-                    .build());
         }
     }
 

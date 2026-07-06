@@ -8,6 +8,8 @@ import com.sales.visits.app.sales.model.entity.Physician;
 import com.sales.visits.app.sales.model.entity.Visit;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class VisitReviewMapper {
     public VisitReviewDetailResponse toDetail(Visit v) {
@@ -22,7 +24,7 @@ public class VisitReviewMapper {
         );
     }
 
-    private AccountReviewDetail toAccountDetail(Account a) {
+    public AccountReviewDetail toAccountDetail(Account a) {
         return new AccountReviewDetail(
                 a.getId(), a.getStatus(), a.getOrganizationName(),
                 a.getParentOrganization() != null ? a.getParentOrganization().getId() : null,
@@ -34,10 +36,22 @@ public class VisitReviewMapper {
         );
     }
 
+    public List<AccountReviewDetail> toAccountsDetail(List<Account> accounts) {
+        return accounts.stream()
+                .map(this::toAccountDetail)
+                .toList();
+    }
+
     private PhysicianReviewDetail toPhysicianDetail(Physician p) {
         return new PhysicianReviewDetail(
                 p.getId(), p.getStatus(), p.getNpi(), p.getName(),
                 p.getSpecialty().getId(), p.getEmail(), p.getPhone()
         );
+    }
+
+    public List<PhysicianReviewDetail> toPhysiciansDetail(List<Physician> physicians) {
+        return physicians.stream()
+                .map(this::toPhysicianDetail)
+                .toList();
     }
 }

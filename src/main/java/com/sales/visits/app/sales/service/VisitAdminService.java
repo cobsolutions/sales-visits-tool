@@ -194,32 +194,6 @@ public class VisitAdminService {
         }
     }
 
-    private Physician resolvePhysician(PhysicianFieldsRequest physicianFieldsRequest, User admin) {
-        if(physicianFieldsRequest.isExisting()){
-            return physicianRepository.findById(physicianFieldsRequest.physicianId())
-                    .orElseThrow(() -> new EntityNotFoundException("Physician with id: " + physicianFieldsRequest.physicianId() + " not found"));
-        }
-        return physicianRepository.findByNpi(physicianFieldsRequest.npi())
-                .orElseGet(() -> {
-                    Specialty specialty = specialtyRepository.findById(physicianFieldsRequest.specialtyId())
-                            .orElseThrow(() -> new EntityNotFoundException("Specialty not found"));
-                    try {
-                        return physicianRepository.save(Physician.builder()
-                                .npi(physicianFieldsRequest.npi())
-                                .name(physicianFieldsRequest.name())
-                                .specialty(specialty)
-                                .email(physicianFieldsRequest.email())
-                                .phone(physicianFieldsRequest.phone())
-                                .status(ApprovalStatus.ACTIVE)
-                                .submittedBy(admin)
-                                .approvedBy(admin)
-                                .build());
-                    } catch (DataIntegrityViolationException e) {
-                        throw new DuplicateNpiException(physicianFieldsRequest.npi());
-                    }
-                });
-    }
-
     private void isNpiUnique(String npi, Long currentPhysicianId) {
         physicianRepository.findByNpi(npi)
                 .filter(other -> !other.getId().equals(currentPhysicianId))
