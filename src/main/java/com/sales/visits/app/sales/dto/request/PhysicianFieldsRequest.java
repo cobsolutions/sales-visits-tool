@@ -7,9 +7,9 @@ public record PhysicianFieldsRequest(
 
         @Pattern(regexp = "^\\d{10}$", message = "NPI must be exactly 10 digits") String npi,
 
-        @NotBlank String name,
+        String name,
 
-        @NotNull Long specialtyId,
+        Long specialtyId,
 
         @Email String email,
 
@@ -19,6 +19,7 @@ public record PhysicianFieldsRequest(
 
     @AssertTrue(message = "Provide either physicianId, or npi+name+specialtyId for a new physician")
     public boolean isValid() {
-        return physicianId != null || npi != null;
+        if (physicianId != null) return true;
+        return npi != null && name != null && !name.isBlank() && specialtyId != null;
     }
 }

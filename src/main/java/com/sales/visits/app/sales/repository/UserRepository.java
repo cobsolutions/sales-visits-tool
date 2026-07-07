@@ -24,7 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
         com.sales.visits.app.sales.model.enums.UserRole.SALES_REP
     )
       AND u.status = com.sales.visits.app.sales.model.enums.UserStatus.ACTIVE
+      AND u.id <> :excludeUserId
     ORDER BY u.username
     """)
-    List<User> findEligibleJoinedVisitors();
+    List<User> findEligibleJoinedVisitors(Long excludeUserId);
 }

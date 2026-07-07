@@ -37,8 +37,8 @@ public class NewVisitController {
 
     @GetMapping("/joined-visitor")
     @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP')")
-    public List<UserSummaryResponse> joinedVisitors(){
-        return newVisitService.findJoinedVisitors().stream()
-                .map(u->new UserSummaryResponse(u.getUsername(),u.getRole())).toList();
+    public List<UserSummaryResponse> joinedVisitors(@AuthenticationPrincipal User currentUser){
+        return newVisitService.findJoinedVisitors(currentUser.getId()).stream()
+                .map(u->new UserSummaryResponse(u.getId(),u.getUsername(),u.getRole())).toList();
     }
 }

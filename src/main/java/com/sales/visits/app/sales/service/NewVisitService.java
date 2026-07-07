@@ -133,7 +133,7 @@ public class NewVisitService {
         }
     }
 
-    public List<User> findJoinedVisitors(){
-        return userRepository.findEligibleJoinedVisitors();
+    public List<User> findJoinedVisitors(Long excludeUserId){
+        return userRepository.findEligibleJoinedVisitors(excludeUserId);
     }
 }
