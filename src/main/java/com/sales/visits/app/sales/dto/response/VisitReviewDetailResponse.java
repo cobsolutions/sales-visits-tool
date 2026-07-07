@@ -12,6 +12,8 @@ public record VisitReviewDetailResponse(
         ApprovalStatus visitStatus,
         LocalDate visitDate,
         VisitType visitType,
+        Long submittedByUserId,
+        String submittedByUsername,
         VisitImpression visitImpression,
         boolean joinedVisit,
         Long joinedVisitorId,

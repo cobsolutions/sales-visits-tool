@@ -15,7 +15,7 @@ public class VisitReviewMapper {
     public VisitReviewDetailResponse toDetail(Visit v) {
         return new VisitReviewDetailResponse(
                 v.getId(), v.getStatus(), v.getVisitDate(), v.getVisitType(),
-                v.getVisitImpression(), v.isJoinedVisit(),
+                v.getVisitor().getId(),v.getVisitor().getUsername(),v.getVisitImpression(), v.isJoinedVisit(),
                 v.getJoinedVisitor() != null ? v.getJoinedVisitor().getId() : null,
                 v.getMaterialsShared(), v.getNotes(), v.getNextVisitDate(),
                 toAccountDetail(v.getAccount()),
