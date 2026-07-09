@@ -28,7 +28,7 @@ public class NewVisitController {
     }
 
     @PostMapping("/new-visit")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_NEW')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_NEW')")
     public ResponseEntity<VisitResponse> newVisit(@Valid @RequestBody NewVisitRequest request,
                                                   @AuthenticationPrincipal User currentUser) {
         Visit visit = newVisitService.createNewVisit(request,currentUser);
@@ -36,7 +36,7 @@ public class NewVisitController {
     }
 
     @GetMapping("/joined-visitor")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP')")
     public List<UserSummaryResponse> joinedVisitors(@AuthenticationPrincipal User currentUser){
         return newVisitService.findJoinedVisitors(currentUser.getId()).stream()
                 .map(u->new UserSummaryResponse(u.getId(),u.getUsername(),u.getRole())).toList();

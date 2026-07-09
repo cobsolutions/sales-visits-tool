@@ -33,4 +33,10 @@ public class StatisticsController {
     public ResponseEntity<Page<VisitReviewDetailResponse>> findMyTeamsVisits(@AuthenticationPrincipal User currentUser, Pageable  pageable) {
         return ResponseEntity.ok(statisticsService.findMyTeamActiveVisits(currentUser,pageable));
     }
+
+    @GetMapping("/submitted-visits")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('VISIT_VIEW_ALL')")
+    public ResponseEntity<Page<VisitReviewDetailResponse>> findAllSubmittedVisits(@AuthenticationPrincipal User admin, Pageable  pageable) {
+        return ResponseEntity.ok(statisticsService.findAllSubmittedVisits(pageable));
+    }
 }

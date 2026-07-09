@@ -41,4 +41,10 @@ public class StatisticsService {
         return visitRepository.findByVisitorIdInAndStatus(salesRepIds,ApprovalStatus.ACTIVE,pageable)
                 .map(visitReviewMapper::toDetail);
     }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findAllSubmittedVisits(Pageable pageable) {
+        return visitRepository.findByStatus(ApprovalStatus.ACTIVE,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
 }

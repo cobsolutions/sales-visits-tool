@@ -34,13 +34,13 @@ public class FollowUpVisitController {
     }
 
     @GetMapping("/accounts/{id}")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
     public AccountReviewDetail getAccountDetails(@PathVariable Long id){
         return visitReviewMapper.toAccountDetail(followUpVisitService.getAccountDetails(id));
     }
 
     @GetMapping("/accounts/active")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
     public List<AccountReviewDetail> getActiveAccounts(){
         return visitReviewMapper.toAccountsDetail(followUpVisitService.getActiveAccounts());
     }
