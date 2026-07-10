@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -45,6 +46,36 @@ public class StatisticsService {
     @Transactional
     public Page<VisitReviewDetailResponse> findAllSubmittedVisits(Pageable pageable) {
         return visitRepository.findByStatus(ApprovalStatus.ACTIVE,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findByVisitDate(LocalDate date,Pageable pageable) {
+        return visitRepository.findByVisitDateAndStatus(date,ApprovalStatus.ACTIVE,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findByVisitDateAndVisitorId(LocalDate visitDate,Long userId,Pageable pageable){
+        return visitRepository.findByVisitDateAndStatusAndVisitorId(visitDate,ApprovalStatus.ACTIVE,userId,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findByOrganizationNameAndVisitorId(String organizationName, Long userId,Pageable pageable){
+        return visitRepository.findByOrganizationNameAndStatusAndVisitorId(organizationName,ApprovalStatus.ACTIVE,userId,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findByOrganizationName(String organizationName,Pageable pageable) {
+        return visitRepository.findByOrganizationName(organizationName,ApprovalStatus.ACTIVE,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findByVisitorUsername(String username, Pageable pageable) {
+        return visitRepository.findByVisitorUsernameAndStatus(username,ApprovalStatus.ACTIVE,pageable)
                 .map(visitReviewMapper::toDetail);
     }
 }
