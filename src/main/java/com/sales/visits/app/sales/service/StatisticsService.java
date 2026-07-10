@@ -4,10 +4,12 @@ import com.sales.visits.app.sales.dto.response.VisitReviewDetailResponse;
 import com.sales.visits.app.sales.mapper.VisitReviewMapper;
 import com.sales.visits.app.sales.model.entity.User;
 import com.sales.visits.app.sales.model.enums.ApprovalStatus;
+import com.sales.visits.app.sales.model.enums.UserRole;
 import com.sales.visits.app.sales.repository.UserRepository;
 import com.sales.visits.app.sales.repository.VisitRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +79,47 @@ public class StatisticsService {
     public Page<VisitReviewDetailResponse> findByVisitorUsername(String username, Pageable pageable) {
         return visitRepository.findByVisitorUsernameAndStatus(username,ApprovalStatus.ACTIVE,pageable)
                 .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public List<VisitReviewDetailResponse> findAllForExport(User currentUser, String filterType, String filterValue) {
+
+        Pageable unpaged = Pageable.unpaged();
+        boolean isSalesRep = currentUser.getRole() == UserRole.SALES_REP;
+        boolean isTeamLeader = currentUser.getRole() == UserRole.TEAM_LEADER;
+        boolean isAdmin = currentUser.getRole() == UserRole.ADMIN;
+
+        Page<VisitReviewDetailResponse> page = null;
+
+        if (filterType == null || filterValue == null || filterValue.isBlank()) {
+            if (isSalesRep) {
+                page = findMyActiveVisits(currentUser, unpaged);
+            } else if (isTeamLeader) {
+                page = findMyTeamActiveVisits(currentUser, unpaged);
+            } else if(isAdmin) {
+                page = findAllSubmittedVisits(unpaged);
+            }
+        } else {
+            switch (filterType) {
+                case "date" -> {
+                    LocalDate date = LocalDate.parse(filterValue);
+                    page = isSalesRep
+                            ? findByVisitDateAndVisitorId(date, currentUser.getId(), unpaged)
+                            : findByVisitDate(date, unpaged);
+                }
+                case "org" -> page = isSalesRep
+                        ? findByOrganizationNameAndVisitorId(filterValue, currentUser.getId(), unpaged)
+                        : findByOrganizationName(filterValue, unpaged);
+                case "name" -> {
+                    if (isSalesRep) {
+                        throw new AccessDeniedException("Sales reps cannot filter by submitted-by");
+                    }
+                    page = findByVisitorUsername(filterValue, unpaged);
+                }
+                default -> throw new IllegalArgumentException("Invalid filter type: " + filterType);
+            }
+        }
+
+        return page.getContent();
     }
 }

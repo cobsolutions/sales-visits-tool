@@ -47,19 +47,19 @@ public class FollowUpVisitController {
 
 
     @GetMapping("/physicians/active")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
     public List<PhysicianReviewDetail> getActivePhysicians(){
         return visitReviewMapper.toPhysiciansDetail(followUpVisitService.getActivePhysicians());
     }
 
     @GetMapping("/active-physicians/account/{id}")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
     public List<PhysicianSummaryResponse> getActivePhysiciansByAccountId(@PathVariable Long id){
         return followUpVisitService.findActivePhysiciansForAccount(id);
     }
 
     @PostMapping("/follow-up-visit")
-    @PreAuthorize("hasAnyRole('TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_FOLLOWUP')")
     public ResponseEntity<VisitResponse> followUpVisit(@Valid @RequestBody FollowUpVisitRequest request,
                                                        @AuthenticationPrincipal User currentUser){
         Visit visit = followUpVisitService.followUpVisit(request,currentUser);
