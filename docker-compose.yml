@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16
+    container_name: sales-visits-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sales-visits
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/main/resources/script.sql:/docker-entrypoint-initdb.d/01-script.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sales-visits"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: sales-visits-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sales-visits
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      JWT_SECRET: ${JWT_SECRET:-K7p9Lm2xQzR8vN4wT6yU1aB3cD5eF7gH9iJ0kL2mN4o=}
+      SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-superadmin123}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

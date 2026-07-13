@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,10 +47,6 @@ public class User implements UserDetails{
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "territory_id")
-    private Territory territory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_leader_id")
