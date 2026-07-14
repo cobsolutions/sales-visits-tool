@@ -24,8 +24,9 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
     SELECT v
     FROM Visit v
     JOIN v.account a
-    WHERE a.organizationName = :organizationName
-        AND v.status = :status
+    WHERE LOWER(a.organizationName)
+    LIKE LOWER(CONCAT('%', :organizationName, '%'))
+    AND v.status = :status
     """)
     Page<Visit> findByOrganizationName(@Param("organizationName") String organizationName,@Param("status") ApprovalStatus status,Pageable pageable);
 
@@ -33,9 +34,10 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
     SELECT v
     FROM Visit v
     JOIN v.account a
-    WHERE a.organizationName = :organizationName
-        AND v.status = :status
-        AND v.visitor.id  = :id
+    WHERE LOWER(a.organizationName)
+    LIKE LOWER(CONCAT('%', :organizationName, '%'))
+    AND v.status = :status
+    AND v.visitor.id = :id
     """)
     Page<Visit> findByOrganizationNameAndStatusAndVisitorId(@Param("organizationName") String organizationName,@Param("status") ApprovalStatus status,@Param("id") Long userId,Pageable pageable);
 
