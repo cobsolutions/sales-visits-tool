@@ -16,7 +16,7 @@ public record NewAccountRequest(
 
         @NotBlank
         @Pattern(regexp = AddressPatterns.ADDRESS_REGEX,
-                message = "Address must be formatted as 'Street, City, ST'")
+                message = "Address must be formatted as 'Street, City'")
         String address,
 
         String floorSuite,

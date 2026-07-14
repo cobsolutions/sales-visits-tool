@@ -62,4 +62,8 @@ public class PhysicianResolutionService {
                     .build());
         }
     }
+
+    public boolean existsByNpi(String npi) {
+        return physicianRepository.existsByNpi(npi);
+    }
 }

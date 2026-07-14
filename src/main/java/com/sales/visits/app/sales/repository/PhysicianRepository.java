@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface PhysicianRepository extends JpaRepository<Physician,Long> {
     Optional<Physician> findByNpi(String npi);
     List<Physician> findAllByStatus(ApprovalStatus  status);
+    boolean existsByNpi(String npi);
 
     @Query("""
        SELECT ap.physician FROM AccountPhysician ap

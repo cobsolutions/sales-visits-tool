@@ -126,7 +126,6 @@ CREATE INDEX IF NOT EXISTS idx_users_team_leader_id  ON users(team_leader_id);
 
 CREATE TABLE IF NOT EXISTS accounts (
                                         id                       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                                        account_id               VARCHAR(30) UNIQUE,
                                         organization_name        VARCHAR(255) NOT NULL,
                                         parent_organization_id   BIGINT REFERENCES parent_organizations(id),
                                         organization_type        VARCHAR(100),
@@ -201,19 +200,7 @@ CREATE TABLE IF NOT EXISTS user_permissions (
     );
 
 -- =========================
--- ROLE DEFAULT PERMISSIONS
--- =========================
-
-CREATE TABLE IF NOT EXISTS role_default_permissions (
-                                                        role          UserRole NOT NULL,
-                                                        permission_id BIGINT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
-                                                        PRIMARY KEY (role, permission_id)
-    );
-
--- =========================
 -- VISITS
--- (matches Visit entity: status, rejection_reason, approved_by,
--- reviewed_at, created_at only — no updated_at)
 -- =========================
 
 CREATE TABLE IF NOT EXISTS visits (

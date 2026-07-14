@@ -20,6 +20,10 @@ public record PhysicianFieldsRequest(
     @AssertTrue(message = "Provide either physicianId, or npi+name+specialtyId for a new physician")
     public boolean isValid() {
         if (physicianId != null) return true;
-        return npi != null && name != null && !name.isBlank() && specialtyId != null;
+        return npi != null && !npi.isBlank()
+                && name != null && !name.isBlank()
+                && specialtyId != null
+                && email != null && !email.isBlank()
+                && phone != null && !phone.isBlank();
     }
 }
