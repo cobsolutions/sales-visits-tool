@@ -144,6 +144,8 @@ public class VisitAdminService {
         if (newAccountRequest.parentOrganizationId() != null) {
             account.setParentOrganization(parentOrganizationRepository.findById(newAccountRequest.parentOrganizationId())
                     .orElseThrow(() -> new EntityNotFoundException("Parent organization not found")));
+        } else {
+            account.setParentOrganization(null);
         }
 
         account.setStatus(ApprovalStatus.ACTIVE);
