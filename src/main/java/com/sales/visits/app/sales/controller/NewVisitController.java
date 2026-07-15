@@ -1,17 +1,13 @@
 package com.sales.visits.app.sales.controller;
 
+import com.sales.visits.app.sales.dto.request.CreateBorough;
 import com.sales.visits.app.sales.dto.request.CreateParentOrganizationRequest;
 import com.sales.visits.app.sales.dto.request.CreatePtocLocation;
 import com.sales.visits.app.sales.dto.request.NewVisitRequest;
-import com.sales.visits.app.sales.dto.response.ParentOrganizationResponse;
-import com.sales.visits.app.sales.dto.response.PtocLocationResponse;
-import com.sales.visits.app.sales.dto.response.UserSummaryResponse;
-import com.sales.visits.app.sales.dto.response.VisitResponse;
+import com.sales.visits.app.sales.dto.response.*;
 import com.sales.visits.app.sales.mapper.VisitMapper;
-import com.sales.visits.app.sales.model.entity.ParentOrganization;
-import com.sales.visits.app.sales.model.entity.PtocLocation;
-import com.sales.visits.app.sales.model.entity.User;
-import com.sales.visits.app.sales.model.entity.Visit;
+import com.sales.visits.app.sales.model.entity.*;
+import com.sales.visits.app.sales.repository.BoroughRepository;
 import com.sales.visits.app.sales.repository.ParentOrganizationRepository;
 import com.sales.visits.app.sales.repository.PtocLocationRepository;
 import com.sales.visits.app.sales.service.NewVisitService;
@@ -34,13 +30,15 @@ public class NewVisitController {
     private final PhysicianResolutionService physicianResolutionService;
     private final ParentOrganizationRepository parentOrganizationRepository;
     private final PtocLocationRepository ptocLocationRepository;
+    private final BoroughRepository boroughRepository;
 
-    public NewVisitController(NewVisitService newVisitService, VisitMapper visitMapper, PhysicianResolutionService physicianResolutionService, ParentOrganizationRepository parentOrganizationRepository, PtocLocationRepository ptocLocationRepository) {
+    public NewVisitController(NewVisitService newVisitService, VisitMapper visitMapper, PhysicianResolutionService physicianResolutionService, ParentOrganizationRepository parentOrganizationRepository, PtocLocationRepository ptocLocationRepository, BoroughRepository boroughRepository) {
         this.newVisitService = newVisitService;
         this.visitMapper = visitMapper;
         this.physicianResolutionService = physicianResolutionService;
         this.parentOrganizationRepository = parentOrganizationRepository;
         this.ptocLocationRepository = ptocLocationRepository;
+        this.boroughRepository = boroughRepository;
     }
 
     @PostMapping("/new-visit")
@@ -98,5 +96,23 @@ public class NewVisitController {
                         PtocLocation.builder().name(req.name().trim()).build()
                 ));
         return ResponseEntity.status(HttpStatus.CREATED).body(new PtocLocationResponse(ptocLocation.getId(), ptocLocation.getName()));
+    }
+
+    @GetMapping("/borough")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP')")
+    public List<BoroughsResponse> listBoroughs() {
+        return boroughRepository.findAllByOrderByNameAsc().stream()
+                .map(o -> new BoroughsResponse(o.getId(), o.getName()))
+                .toList();
+    }
+
+    @PostMapping("/borough")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_NEW')")
+    public ResponseEntity<BoroughsResponse> createNewBorough(@Valid @RequestBody CreateBorough req) {
+        Borough borough = boroughRepository.findByName(req.name().trim())
+                .orElseGet(() -> boroughRepository.save(
+                        Borough.builder().name(req.name().trim()).build()
+                ));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoroughsResponse(borough.getId(), borough.getName()));
     }
 }

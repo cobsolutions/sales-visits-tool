@@ -20,17 +20,15 @@ import java.util.*;
 public class NewVisitService {
     private final AccountRepository accountRepository;
     private final VisitRepository visitRepository;
-    private final AccountPhysicianRepository accountPhysicianRepository;
     private final BoroughRepository boroughRepository;
     private final PtocLocationRepository ptocLocationRepository;
     private final ParentOrganizationRepository parentOrganizationRepository;
     private final UserRepository userRepository;
     private final PhysicianResolutionService physicianResolutionService;
 
-    public NewVisitService(AccountRepository accountRepository, VisitRepository visitRepository, AccountPhysicianRepository accountPhysicianRepository, BoroughRepository boroughRepository, PtocLocationRepository ptocLocationRepository, ParentOrganizationRepository parentOrganizationRepository, UserRepository userRepository, PhysicianResolutionService physicianResolutionService) {
+    public NewVisitService(AccountRepository accountRepository, VisitRepository visitRepository, BoroughRepository boroughRepository, PtocLocationRepository ptocLocationRepository, ParentOrganizationRepository parentOrganizationRepository, UserRepository userRepository, PhysicianResolutionService physicianResolutionService) {
         this.accountRepository = accountRepository;
         this.visitRepository = visitRepository;
-        this.accountPhysicianRepository = accountPhysicianRepository;
         this.boroughRepository = boroughRepository;
         this.ptocLocationRepository = ptocLocationRepository;
         this.parentOrganizationRepository = parentOrganizationRepository;

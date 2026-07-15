@@ -51,4 +51,47 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
         AND v.visitor.id  = :id
     """)
     Page<Visit> findByVisitDateAndStatusAndVisitorId(@Param("visitDate") LocalDate visitDate,@Param("status") ApprovalStatus status,@Param("id") Long userId,Pageable pageable);
+
+    @Query("""
+        SELECT v FROM Visit v
+        JOIN FETCH v.account
+        JOIN FETCH v.visitor
+        WHERE v.visitor.id = :userId
+          AND v.status = :status
+          AND v.nextVisitDate >= :from
+        ORDER BY v.nextVisitDate ASC
+        """)
+    List<Visit> findUpcomingForSales(
+            @Param("userId") Long userId,
+            @Param("status") ApprovalStatus status,
+            @Param("from") LocalDate from
+    );
+
+    @Query("""
+        SELECT v FROM Visit v
+        JOIN FETCH v.account
+        JOIN FETCH v.visitor vr
+        WHERE (v.visitor.id = :teamLeaderId OR vr.teamLeader.id = :teamLeaderId)
+          AND v.status = :status
+          AND v.nextVisitDate >= :from
+        ORDER BY v.nextVisitDate ASC
+        """)
+    List<Visit> findUpcomingForTeam(
+            @Param("teamLeaderId") Long teamLeaderId,
+            @Param("status") ApprovalStatus status,
+            @Param("from") LocalDate from
+    );
+
+    @Query("""
+        SELECT v FROM Visit v
+        JOIN FETCH v.account
+        JOIN FETCH v.visitor
+        WHERE v.status = :status
+          AND v.nextVisitDate >= :from
+        ORDER BY v.nextVisitDate ASC
+        """)
+    List<Visit> findUpcomingAll(
+            @Param("status") ApprovalStatus status,
+            @Param("from") LocalDate from
+    );
 }
