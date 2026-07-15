@@ -1,15 +1,13 @@
 package com.sales.visits.app.sales.controller;
 
-import com.sales.visits.app.sales.dto.request.CreateBorough;
-import com.sales.visits.app.sales.dto.request.CreateParentOrganizationRequest;
-import com.sales.visits.app.sales.dto.request.CreatePtocLocation;
-import com.sales.visits.app.sales.dto.request.NewVisitRequest;
+import com.sales.visits.app.sales.dto.request.*;
 import com.sales.visits.app.sales.dto.response.*;
 import com.sales.visits.app.sales.mapper.VisitMapper;
 import com.sales.visits.app.sales.model.entity.*;
 import com.sales.visits.app.sales.repository.BoroughRepository;
 import com.sales.visits.app.sales.repository.ParentOrganizationRepository;
 import com.sales.visits.app.sales.repository.PtocLocationRepository;
+import com.sales.visits.app.sales.repository.SpecialtyRepository;
 import com.sales.visits.app.sales.service.NewVisitService;
 import com.sales.visits.app.sales.service.PhysicianResolutionService;
 import jakarta.validation.Valid;
@@ -31,14 +29,16 @@ public class NewVisitController {
     private final ParentOrganizationRepository parentOrganizationRepository;
     private final PtocLocationRepository ptocLocationRepository;
     private final BoroughRepository boroughRepository;
+    private final SpecialtyRepository specialtyRepository;
 
-    public NewVisitController(NewVisitService newVisitService, VisitMapper visitMapper, PhysicianResolutionService physicianResolutionService, ParentOrganizationRepository parentOrganizationRepository, PtocLocationRepository ptocLocationRepository, BoroughRepository boroughRepository) {
+    public NewVisitController(NewVisitService newVisitService, VisitMapper visitMapper, PhysicianResolutionService physicianResolutionService, ParentOrganizationRepository parentOrganizationRepository, PtocLocationRepository ptocLocationRepository, BoroughRepository boroughRepository, SpecialtyRepository specialtyRepository) {
         this.newVisitService = newVisitService;
         this.visitMapper = visitMapper;
         this.physicianResolutionService = physicianResolutionService;
         this.parentOrganizationRepository = parentOrganizationRepository;
         this.ptocLocationRepository = ptocLocationRepository;
         this.boroughRepository = boroughRepository;
+        this.specialtyRepository = specialtyRepository;
     }
 
     @PostMapping("/new-visit")
@@ -114,5 +114,23 @@ public class NewVisitController {
                         Borough.builder().name(req.name().trim()).build()
                 ));
         return ResponseEntity.status(HttpStatus.CREATED).body(new BoroughsResponse(borough.getId(), borough.getName()));
+    }
+
+    @GetMapping("/specialty")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP')")
+    public List<SpecialtyResponse> listSpecialties() {
+        return specialtyRepository.findAllByOrderByNameAsc().stream()
+                .map(o -> new SpecialtyResponse(o.getId(), o.getName()))
+                .toList();
+    }
+
+    @PostMapping("/specialty")
+    @PreAuthorize("hasAnyRole('ADMIN','TEAM_LEADER','SALES_REP') and hasAuthority('VISIT_CREATE_NEW')")
+    public ResponseEntity<SpecialtyResponse> createNewSpecialty(@Valid @RequestBody CreateSpecialty req) {
+        Specialty specialty = specialtyRepository.findByName(req.name().trim())
+                .orElseGet(() -> specialtyRepository.save(
+                        Specialty.builder().name(req.name().trim()).build()
+                ));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SpecialtyResponse(specialty.getId(), specialty.getName()));
     }
 }
