@@ -254,10 +254,9 @@ SELECT setval(pg_get_serial_sequence('boroughs', 'id'), (SELECT MAX(id) FROM bor
 
 -- PTOC_LOCATIONS
 INSERT INTO ptoc_locations (id, name) OVERRIDING SYSTEM VALUE VALUES
-                                                                  (1, 'PTOC North'),
-                                                                  (2, 'PTOC South'),
-                                                                  (3, 'PTOC East'),
-                                                                  (4, 'PTOC West')
+                                                                  (1, 'Upper East Side Clinic'),
+                                                                  (2, 'Downtown Brooklyn Clinic'),
+                                                                  (3, 'Flushing Clinic'),
     ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
 SELECT setval(pg_get_serial_sequence('ptoc_locations', 'id'), (SELECT MAX(id) FROM ptoc_locations));
