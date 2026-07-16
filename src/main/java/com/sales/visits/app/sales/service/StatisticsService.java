@@ -34,20 +34,37 @@ public class StatisticsService {
                 .map(visitReviewMapper::toDetail);
     }
 
+    @Transactional(readOnly = true)
+    public Page<VisitReviewDetailResponse> findMyPendingVisits(User currentUser, Pageable pageable) {
+        return visitRepository.findByVisitorIdAndStatus(currentUser.getId(), ApprovalStatus.PENDING_APPROVAL, pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
     @Transactional
     public Page<VisitReviewDetailResponse> findMyTeamActiveVisits(User teamLeader, Pageable pageable) {
         List<Long> salesRepIds = userRepository.findIdsByTeamLeaderId(teamLeader.getId());
-        if (salesRepIds.isEmpty()) {
-            return Page.empty(pageable);
-        }
         salesRepIds.add(teamLeader.getId());
         return visitRepository.findByVisitorIdInAndStatus(salesRepIds,ApprovalStatus.ACTIVE,pageable)
                 .map(visitReviewMapper::toDetail);
     }
 
     @Transactional
+    public Page<VisitReviewDetailResponse> findMyTeamPendingVisits(User teamLeader, Pageable pageable) {
+        List<Long> salesRepIds = userRepository.findIdsByTeamLeaderId(teamLeader.getId());
+        salesRepIds.add(teamLeader.getId());
+        return visitRepository.findByVisitorIdInAndStatus(salesRepIds,ApprovalStatus.PENDING_APPROVAL,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
     public Page<VisitReviewDetailResponse> findAllSubmittedVisits(Pageable pageable) {
         return visitRepository.findByStatus(ApprovalStatus.ACTIVE,pageable)
+                .map(visitReviewMapper::toDetail);
+    }
+
+    @Transactional
+    public Page<VisitReviewDetailResponse> findAllPendingVisits(Pageable pageable) {
+        return visitRepository.findByStatus(ApprovalStatus.PENDING_APPROVAL,pageable)
                 .map(visitReviewMapper::toDetail);
     }
 

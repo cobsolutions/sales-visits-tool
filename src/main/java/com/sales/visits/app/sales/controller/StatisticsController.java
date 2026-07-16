@@ -34,6 +34,12 @@ public class StatisticsController {
         return ResponseEntity.ok(statisticsService.findMyActiveVisits(currentUser,pageable));
     }
 
+    @GetMapping("/my-pending-visits")
+    @PreAuthorize("hasRole('SALES_REP') and hasAuthority('VISIT_VIEW_OWN')")
+    public ResponseEntity<Page<VisitReviewDetailResponse>> findMyPendingVisits(@AuthenticationPrincipal User currentUser, Pageable  pageable) {
+        return ResponseEntity.ok(statisticsService.findMyPendingVisits(currentUser,pageable));
+    }
+
 
     @GetMapping("/team-visits")
     @PreAuthorize("hasRole('TEAM_LEADER') and hasAuthority('VISIT_VIEW_TEAM')")
@@ -42,11 +48,25 @@ public class StatisticsController {
         return ResponseEntity.ok(statisticsService.findMyTeamActiveVisits(currentUser,pageable));
     }
 
+    @GetMapping("/team-pending-visits")
+    @PreAuthorize("hasRole('TEAM_LEADER') and hasAuthority('VISIT_VIEW_TEAM')")
+    public ResponseEntity<Page<VisitReviewDetailResponse>> findMyTeamsPendingVisits(@AuthenticationPrincipal User currentUser,
+                                                                             Pageable  pageable) {
+        return ResponseEntity.ok(statisticsService.findMyTeamPendingVisits(currentUser,pageable));
+    }
+
     @GetMapping("/submitted-visits")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('VISIT_VIEW_ALL')")
     public ResponseEntity<Page<VisitReviewDetailResponse>> findAllSubmittedVisits(@AuthenticationPrincipal User admin,
                                                                                   Pageable  pageable) {
         return ResponseEntity.ok(statisticsService.findAllSubmittedVisits(pageable));
+    }
+
+    @GetMapping("/pending-visits")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('VISIT_VIEW_ALL')")
+    public ResponseEntity<Page<VisitReviewDetailResponse>> findAllPendingVisits(@AuthenticationPrincipal User admin,
+                                                                                  Pageable  pageable) {
+        return ResponseEntity.ok(statisticsService.findAllPendingVisits(pageable));
     }
 
     @GetMapping("/filterBy-date/{visitDate}")
