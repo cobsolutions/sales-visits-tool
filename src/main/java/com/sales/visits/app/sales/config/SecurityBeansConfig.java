@@ -53,6 +53,7 @@ public class SecurityBeansConfig  {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/forgot-password/**").permitAll()
                         .requestMatchers("/api/login", "/error").permitAll()
                         .anyRequest().authenticated()
                 )

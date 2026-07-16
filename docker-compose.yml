@@ -18,6 +18,13 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: sales-visits-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
   app:
     build: .
     container_name: sales-visits-app
@@ -25,10 +32,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sales-visits
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-K7p9Lm2xQzR8vN4wT6yU1aB3cD5eF7gH9iJ0kL2mN4o=}
       SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-superadmin123}
     ports:

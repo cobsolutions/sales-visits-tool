@@ -49,4 +49,14 @@ public class GlobalExceptionHandler {
             .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
     return ResponseEntity.badRequest().body(errors);
   }
+
+  @ExceptionHandler(InvalidOtpException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidOtp(InvalidOtpException ex) {
+    return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+  }
+
+  @ExceptionHandler(PasswordResetNotAllowedException.class)
+  public ResponseEntity<ErrorResponse> handleResetNotAllowed(PasswordResetNotAllowedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ex.getMessage()));
+  }
 }
