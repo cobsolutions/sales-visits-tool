@@ -58,13 +58,12 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
         JOIN FETCH v.visitor
         WHERE v.visitor.id = :userId
           AND v.status = :status
-          AND v.nextVisitDate >= :from
+          AND v.nextVisitDate IS NOT NULL
         ORDER BY v.nextVisitDate ASC
         """)
     List<Visit> findUpcomingForSales(
             @Param("userId") Long userId,
-            @Param("status") ApprovalStatus status,
-            @Param("from") LocalDate from
+            @Param("status") ApprovalStatus status
     );
 
     @Query("""
@@ -73,13 +72,12 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
         JOIN FETCH v.visitor vr
         WHERE (v.visitor.id = :teamLeaderId OR vr.teamLeader.id = :teamLeaderId)
           AND v.status = :status
-          AND v.nextVisitDate >= :from
+          AND v.nextVisitDate IS NOT NULL
         ORDER BY v.nextVisitDate ASC
         """)
     List<Visit> findUpcomingForTeam(
             @Param("teamLeaderId") Long teamLeaderId,
-            @Param("status") ApprovalStatus status,
-            @Param("from") LocalDate from
+            @Param("status") ApprovalStatus status
     );
 
     @Query("""
@@ -87,11 +85,10 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
         JOIN FETCH v.account
         JOIN FETCH v.visitor
         WHERE v.status = :status
-          AND v.nextVisitDate >= :from
+          AND v.nextVisitDate IS NOT NULL
         ORDER BY v.nextVisitDate ASC
         """)
     List<Visit> findUpcomingAll(
-            @Param("status") ApprovalStatus status,
-            @Param("from") LocalDate from
+            @Param("status") ApprovalStatus status
     );
 }

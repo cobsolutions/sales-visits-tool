@@ -37,19 +37,19 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public List<CalendarVisitDto> getUpcomingVisitsForSalesRep(User salesRep) {
-        List<Visit> visits = visitRepository.findUpcomingForSales(salesRep.getId(), CALENDAR_STATUS, LocalDate.now());
+        List<Visit> visits = visitRepository.findUpcomingForSales(salesRep.getId(), CALENDAR_STATUS);
         return toDtoList(visits);
     }
 
     @Transactional(readOnly = true)
     public List<CalendarVisitDto> getUpcomingVisitsForTeamLeader(User teamLeader) {
-        List<Visit> visits = visitRepository.findUpcomingForTeam(teamLeader.getId(), CALENDAR_STATUS, LocalDate.now());
+        List<Visit> visits = visitRepository.findUpcomingForTeam(teamLeader.getId(), CALENDAR_STATUS);
         return toDtoList(visits);
     }
 
     @Transactional(readOnly = true)
     public List<CalendarVisitDto> getUpcomingVisitsForAdmin(User admin) {
-        List<Visit> visits = visitRepository.findUpcomingAll(CALENDAR_STATUS, LocalDate.now());
+        List<Visit> visits = visitRepository.findUpcomingAll(CALENDAR_STATUS);
         return toDtoList(visits);
     }
 
